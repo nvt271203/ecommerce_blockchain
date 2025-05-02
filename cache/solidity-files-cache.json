@@ -1,0 +1,41 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "C:\\Users\\nvtai\\HardhatSource\\blockchain_ecommerce\\contracts\\MarketplaceProducts.sol": {
+      "lastModificationDate": 1744280988563,
+      "contentHash": "25643f9f414eb086d0305123795a2fae",
+      "sourceName": "contracts/MarketplaceProducts.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.9"
+      ],
+      "artifacts": [
+        "MarketplaceProducts"
+      ]
+    }
+  }
+}

@@ -1,0 +1,2 @@
+C:/Users/nvtai/StudioProjects/sales_business_app/android/app/.cxx/Debug/5l5z5n4q/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/nvtai/StudioProjects/sales_business_app/android/app/.cxx/Debug/5l5z5n4q/x86_64/CMakeFiles/rebuild_cache.dir

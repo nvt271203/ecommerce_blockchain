@@ -1,0 +1,17 @@
+- Hôm nay là bài lab passwork attack.
++ Phương pháp: Dictionary attack. 
++ Model triển khai: 1 máy tấn công (kali), 1 máy victim (win 7).
++ Sử dụng giao thức smb.
++ Attacker tạo ra 1 file chứa các username (username.txt) => Tạo ra 1 cái list password mà user hay dùng => 1 dictionary.
++ Thông tin của victim (tự đặt bất kì), sử dụng kali để tấn công.
++ Lúc đầu thì set password đơn giản thôi, sau khi tấn công thành công rồi thì set lại password phức tạp hơn.
++ Hoàn thiện bài lab trong buổi học này luôn.
+- Tuần sau là bài lab DDOS.
+- Báo cáo là 30 trang.
+- Defend: lý thuyết -> nhận thức của người dùng (module 9) -> 4 mục đầu của chương 1.
++ Fake website: username, password. Làm 3 phương pháp: Website và email.  kick vào tải mã độc (malware).
++ Defend khó về mặt tool. Đưa ra cơ sở lý thuyết -> docs cho người dùng đọc. Giới thiệu các tool có sẵn để phân tích các link để người dùng biết (tự xây dựng một tool để check các link cho user). Hoặc extend từ nhóm khác.
+
+- Một số hình thức bảo mật: các cái cô dạy.
+- Tên đề tài và mô phỏng các hình thức tấn công. Đưa ra hình vẽ về model tấn công (các component tham gia, các component làm j với nhau, kết quả dự kiến và các bước tiến hành).
+- Tài liệu tiếng Việt, tiếng Anh và Internet.
