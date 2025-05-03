@@ -15,8 +15,9 @@ class Constants {
 
   //=======>Blockchain Data
   //Contract Data
-  final CONTRACT_ADDRESS = "0x37369b8a6befccc4c5d4a6d0e9284e5b002e795f";
+  // final CONTRACT_ADDRESS = "0x37369b8a6befccc4c5d4a6d0e9284e5b002e795f";
 
+  final CONTRACT_ADDRESS = "0xa89b2ceb338485ac2a7d0765ecae37af62a67b9e";
   // final CONTRACT_ADDRESS = "0x5a7f23b2b209f4aeb0e0c41343f3cd8367309242";
 
   // final CONTRACT_ABI_PATH = "assets/abis/MarketplaceProducts.json";

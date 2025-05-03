@@ -5,6 +5,7 @@ import 'package:sales_business_app/views/screens/add_product_screen.dart';
 import 'package:sales_business_app/views/screens/nav_screen/widgets/popular_product_widget.dart';
 import 'package:sales_business_app/views/screens/widgets/button_widget.dart';
 import '../../../models/product.dart';
+import '../../../services/ContractFactoryServies.dart';
 
 class StoresScreen extends StatefulWidget {
   const StoresScreen({super.key});
@@ -15,11 +16,47 @@ class StoresScreen extends StatefulWidget {
 
 class _StoresScreenState extends State<StoresScreen> {
   late Future<List<Product>> futureProducts;
+  final ContractFactoryServies _contractFactoryServies = ContractFactoryServies();
+  String? walletAddress;
+  bool isLoading = false; // Biến để kiểm soát trạng thái loading
+  String? balance; // Biến lưu số dư ví (nếu cần)
 
   @override
   void initState() {
     super.initState();
+    // Không gọi _checkExistingConnection ngay tại initState để tránh kiểm tra ví không cần thiết
     futureProducts = ProductController().loadPopularProducts();
+  }
+
+  Future<void> _checkExistingConnection() async {
+    setState(() {
+      isLoading = true; // Bật loading khi bắt đầu kiểm tra
+    });
+
+    final address = await _contractFactoryServies.restoreWalletConnection();
+    if (address != null) {
+      setState(() {
+        walletAddress = address;
+        print('walletAddress: $walletAddress');
+
+        // Lấy số dư ví (nếu cần)
+        _contractFactoryServies.getBalance(address).then((value) {
+          setState(() {
+            balance = value;
+            print('Số dư ví: $balance');
+          });
+        });
+        isLoading = false; // Tắt loading khi lấy địa chỉ ví thành công
+      });
+    } else {
+      setState(() {
+        isLoading = false; // Tắt loading nếu không lấy được địa chỉ ví
+      });
+      // Có thể hiển thị thông báo lỗi nếu cần
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Không thể kết nối ví. Vui lòng thử lại.')),
+      );
+    }
   }
 
   @override
@@ -94,13 +131,22 @@ class _StoresScreenState extends State<StoresScreen> {
               SizedBox(height: 16),
               Divider(thickness: 1.5, color: Colors.grey[400]),
               SizedBox(height: 16),
-              ButtonWidget(
-                onClick: () {
-                  Navigator.push(
-                    context,
-                    // MaterialPageRoute(builder: (context) => AddProductScreen()),
-                    MaterialPageRoute(builder: (context) => CreateProductPage()),
-                  );
+              // Nút Add Product với trạng thái loading
+              isLoading
+                  ? Center(
+                child: CircularProgressIndicator(),
+              )
+                  : ButtonWidget(
+                onClick: () async {
+                  await _checkExistingConnection(); // Kiểm tra ví khi nhấn nút
+                  if (walletAddress != null) {
+                    // Chỉ điều hướng nếu lấy được địa chỉ ví
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CreateProductPage(walletAddress: walletAddress!,)),
+                    );
+                  }
                 },
                 title: 'Add Product',
                 icon: Icons.add,

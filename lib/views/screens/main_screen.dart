@@ -5,6 +5,8 @@ import 'package:sales_business_app/views/screens/nav_screen/favorite_screen.dart
 import 'package:sales_business_app/views/screens/nav_screen/home_screen.dart';
 import 'package:sales_business_app/views/screens/nav_screen/stores_screen.dart';
 
+import '../../services/ContractFactoryServies.dart';
+
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 

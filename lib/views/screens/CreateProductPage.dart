@@ -6,11 +6,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:sales_business_app/views/screens/widgets/CustomLoaderWidget.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+
 // import 'package:ercommerce_ddap/widgets/CustomButtonWIdget.dart';
 // import 'package:ercommerce_ddap/widgets/CustomLoaderWidget.dart';
 // import 'package:ercommerce_ddap/widgets/CustomTextFieldWidgets.dart';
 
 import '../../services/ContractFactoryServies.dart';
+
 // import '../services/ContractFactoryServies.dart';
 // import '../utils/Constants.dart';
 import 'package:http/http.dart' as http;
@@ -20,8 +22,8 @@ import 'CustomTextFieldWidgets.dart';
 import 'nav_screen/widgets/CustomButtonWIdget.dart';
 
 class CreateProductPage extends StatefulWidget {
-  const CreateProductPage({Key? key}) : super(key: key);
-
+  const CreateProductPage({Key? key, required this.walletAddress}) : super(key: key);
+  final String walletAddress;
   @override
   State<CreateProductPage> createState() => _CreateProductPageState();
 }
@@ -33,6 +35,15 @@ class _CreateProductPageState extends State<CreateProductPage> {
   TextEditingController priceController = TextEditingController();
   String dropMenuValue = "3D";
   String ipfsImageHash = "";
+
+  @override
+  void initState() {
+    super.initState();
+    nameController.text = "Áo Chống Nắng Nam"; // Giá trị tĩnh cho tên sản phẩm
+    descriptionController.text =
+        "Áo Sơ Mi Dài Tay JAMINE HOUSE Mẫu Trơn Nam Nữ Mặc Được Cá Tính"; // Giá trị tĩnh cho mô tả
+    priceController.text = "1000000000000000000"; // Giá trị tĩnh cho giá
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +142,8 @@ class _CreateProductPageState extends State<CreateProductPage> {
                             : Padding(
                                 padding: const EdgeInsets.only(top: 18.0),
                                 child: customButtonWidget(() async {
-                                  print('contractFactory.myAccount.toString() ${_contractFactoryServies.myAccount.toString()}');
+                                  print(
+                                      'contractFactory.myAccount.toString() ${_contractFactoryServies.myAccount.toString()}');
 
                                   // launchUrlString(contractFactory.uri,
                                   //     mode: LaunchMode.externalApplication);
@@ -142,8 +154,10 @@ class _CreateProductPageState extends State<CreateProductPage> {
                                       ipfsImageHash,
                                       priceController.text,
                                       dropMenuValue,
-                                      // contractFactory.myAccount.toString(),
-                                      '0xe9ec2f28bcbb0650636e6188ed50317227de6fe0',
+                                      widget.walletAddress,
+                                      // _contractFactoryServies.myAccount
+                                      //     .toString(),
+                                      // '0xe9ec2f28bcbb0650636e6188ed50317227de6fe0',
                                       context);
                                   // await contractFactory.addProduct(
                                   // 'Áo Chống Nắng Nam',
@@ -154,7 +168,6 @@ class _CreateProductPageState extends State<CreateProductPage> {
                                   //   contractFactory.myAccount.toString(),
                                   // context,
                                   // );
-
                                 },
                                     10,
                                     constants.mainBlackColor,

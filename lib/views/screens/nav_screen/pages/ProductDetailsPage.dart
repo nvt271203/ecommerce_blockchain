@@ -14,19 +14,54 @@ import '../../../../utils/Constants.dart';
 // import '../services/ContractFactoryServies.dart';
 import '../widgets/CustomButtonWIdget.dart';
 
-class ProductDetailsPage extends StatelessWidget {
+class ProductDetailsPage extends StatefulWidget {
   ProductModel product;
 
   ProductDetailsPage({required this.product, Key? key}) : super(key: key);
+
+  @override
+  State<ProductDetailsPage> createState() => _ProductDetailsPageState();
+}
+class _ProductDetailsPageState extends State<ProductDetailsPage> {
   Constants constants = Constants();
+  final ContractFactoryServies _contractFactoryServies = ContractFactoryServies();
+  String? walletAddress;
+  bool isLoading = false; // Biến để kiểm soát trạng thái loading
+
+  @override
+  void initState() {
+    super.initState();
+    _checkExistingConnection(); // Kiểm tra ví ngay khi trang được tải
+  }
+
+  Future<void> _checkExistingConnection() async {
+    setState(() {
+      isLoading = true; // Bật loading khi bắt đầu kiểm tra
+    });
+
+    final address = await _contractFactoryServies.restoreWalletConnection();
+    if (address != null) {
+      setState(() {
+        walletAddress = address;
+        print('walletAddress: $walletAddress');
+        isLoading = false; // Tắt loading khi lấy địa chỉ ví thành công
+      });
+    } else {
+      setState(() {
+        isLoading = false; // Tắt loading nếu không lấy được địa chỉ ví
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Không thể kết nối ví. Vui lòng thử lại.')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     var contractFactory = Provider.of<ContractFactoryServies>(context);
 
     var convertedPrice =
-        (int.parse(product.price.toString()) / 1000000000000000000).toString();
-    // var cutPrice = convertedPrice.toString().substring(0,6);
+    (int.parse(widget.product.price.toString()) / 1000000000000000000).toString();
 
     return Scaffold(
       backgroundColor: constants.mainBGColor,
@@ -34,7 +69,7 @@ class ProductDetailsPage extends StatelessWidget {
         backgroundColor: constants.mainBGColor,
         elevation: 0,
         title: Text(
-          product.name,
+          widget.product.name,
           style: TextStyle(color: constants.mainYellowColor),
         ),
         iconTheme: IconThemeData(color: constants.mainYellowColor),
@@ -49,7 +84,7 @@ class ProductDetailsPage extends StatelessWidget {
               width: double.infinity,
               decoration: BoxDecoration(
                   image: DecorationImage(
-                      image: NetworkImage(product.image),
+                      image: NetworkImage(widget.product.image),
                       fit: BoxFit.cover,
                       scale: 1)),
             ),
@@ -79,10 +114,10 @@ class ProductDetailsPage extends StatelessWidget {
                               Text(
                                 "Category",
                                 style:
-                                    TextStyle(color: constants.mainYellowColor),
+                                TextStyle(color: constants.mainYellowColor),
                               ),
                               Text(
-                                product.category,
+                                widget.product.category,
                                 style: TextStyle(
                                     color: constants.mainWhiteGColor,
                                     fontSize: 20),
@@ -128,7 +163,7 @@ class ProductDetailsPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(right: 18.0, left: 18),
               child: Text(
-                product.description,
+                widget.product.description,
                 style: TextStyle(
                     color: constants.mainBlackColor,
                     fontWeight: FontWeight.normal,
@@ -146,7 +181,7 @@ class ProductDetailsPage extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          RandomAvatar(product.owner.toString(),
+                          RandomAvatar(widget.product.owner.toString(),
                               height: 50, width: 50)
                         ],
                       ),
@@ -161,7 +196,7 @@ class ProductDetailsPage extends StatelessWidget {
                               style: TextStyle(color: constants.mainBlackColor),
                             ),
                             Text(
-                              product.owner.toString(),
+                              widget.product.owner.toString(),
                               style: TextStyle(
                                   color: constants.mainGrayColor, fontSize: 10),
                             )
@@ -179,30 +214,51 @@ class ProductDetailsPage extends StatelessWidget {
               children: [
                 convertedPrice.length > 3
                     ? Text(
-                        " ETH ${convertedPrice.substring(0, 5)} ",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 35,
-                            color: constants.mainBlackColor),
-                      )
+                  " ETH ${convertedPrice.substring(0, 5)} ",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 35,
+                      color: constants.mainBlackColor),
+                )
                     : Text(
-                        " ETH ${convertedPrice} ",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 35,
-                            color: constants.mainBlackColor),
-                      ),
-                product.owner.toString() != contractFactory.myAccount
-                    ? customButtonWidget(() async {
-                        // contractFactory.buyProduct(product.id,contractFactory.myAccount.toString(),product.price)
-                        ;
-                      }, 15, constants.mainBlackColor, "BUY NOW",
-                        constants.mainWhiteGColor, 150)
+                  " ETH ${convertedPrice} ",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 35,
+                      color: constants.mainBlackColor),
+                ),
+                widget.product.owner.toString() != contractFactory.myAccount
+                    ? isLoading
+                    ? CircularProgressIndicator(
+                  color: constants.mainYellowColor,
+                )
+                    : customButtonWidget(() async {
+                  // Gọi hàm kiểm tra kết nối ví
+                  await _checkExistingConnection();
+
+                  // Kiểm tra nếu walletAddress tồn tại thì thực hiện mua
+                  if (walletAddress != null) {
+                    print('wallet_restore_address $walletAddress');
+                    await contractFactory.buyProduct(
+                      widget.product.id,
+                      // contractFactory.myAccount.toString(),
+                      walletAddress!,
+                      widget.product.price,
+                    );
+                    // Có thể thêm thông báo thành công
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Mua sản phẩm thành công!')),
+                    );
+                  } else {
+                    // Nếu không có walletAddress, thông báo lỗi (đã xử lý trong _checkExistingConnection)
+                  }
+                }, 15, constants.mainBlackColor, "BUY NOW",
+                    constants.mainWhiteGColor, 150)
                     : Text(
-                        "Can not Buy Yours",
-                        style: TextStyle(
-                            fontSize: 10, color: constants.mainRedColor),
-                      )
+                  "Can not Buy Yours",
+                  style: TextStyle(
+                      fontSize: 10, color: constants.mainRedColor),
+                )
               ],
             )
           ],

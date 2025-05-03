@@ -475,7 +475,7 @@ class ContractFactoryServies extends ChangeNotifier {
       BuildContext context,
       ) async {
 
-    if (myAccount == null || myAccount!.isEmpty) {
+    if (myAccount == null) {
       String? walletAccount = await onWalletConnect();
       if (walletAccount == null) {
         print("⚠️ Không thể kết nối với ví - myAccount - ");
@@ -524,13 +524,19 @@ class ContractFactoryServies extends ChangeNotifier {
         ),
       );
 
-      print("✅ Giao dịch thKhông thể kết nối với ví.ành công: $result");
+      print("✅ Giao dịch thành công: $result");
+
+      // Gọi _getAllProducts() ngay sau khi giao dịch thành công
+      await _getAllProducts();
+      notifyListeners();
+      print("Danh sách sản phẩm đã được cập nhật: ${allProducts.length} sản phẩm");
+
     } catch (error) {
       print("❌ Lỗi khi gửi giao dịch: $error");
     }
 
     fetchProductCreatedEvent(context);
-    notifyListeners();
+    // notifyListeners();
   }
   //Create Product Event
   fetchProductCreatedEvent(context) async {
@@ -538,10 +544,15 @@ class ContractFactoryServies extends ChangeNotifier {
         .events(FilterOptions.events(
         contract: _contract!, event: _contract!.event("CreatedProduct")))
         .take(1)
-        .listen((event) {
+        .listen((event) async {
       print("event of Create Product ${event}");
       if (event.transactionHash!.isNotEmpty) {
         productCreatedLoading = false;
+
+        // Cập nhật lại danh sách sản phẩm
+        // await _getAllProducts(); // Làm mới allProducts
+        // print("Danh sách sản phẩm đã được cập nhật: ${allProducts.length} sản phẩm");
+
         // Navigator.pushReplacement(
         //     context,
         //     MaterialPageRoute(
@@ -553,6 +564,68 @@ class ContractFactoryServies extends ChangeNotifier {
   }
   saveAccountAddress(String account) {
     myAccount = account;
+    notifyListeners();
+  }
+
+
+  // -------------------BUY PRODUCT-----------------------------------------------------
+  buyProduct(BigInt id, String account, BigInt amount) async {
+    // if (_contract == null) {
+    //   print("⚠️ Lỗi: Hợp đồng thông minh chưa được khởi tạo!");
+    //   return;
+    // }
+    //
+    // if (web3App == null) {
+    //   print("⚠️ Lỗi: web3App chưa được khởi tạo!");
+    //   return;
+    // }
+
+    if (myAccount == null) {
+      String? walletAccount = await onWalletConnect();
+      if (walletAccount == null) {
+        print("⚠️ Không thể kết nối với ví.");
+        return;
+      }
+      saveAccountAddress(walletAccount);
+    }
+
+    // 🔹 Kiểm tra session có tồn tại không
+    final sessions = web3App!.sessions.getAll();
+    if (sessions.isEmpty) {
+      print("⚠️ Không tìm thấy session hoạt động!");
+      return;
+    }
+    final session = sessions.first; // Chọn session đầu tiên
+
+    // 🔹 Mã hóa dữ liệu giao dịch (ABI Encoding)
+    final function = _contract!.function("buyProduct");
+    final encodedData = function.encodeCall([id]);
+
+    // 🔹 Chuẩn bị dữ liệu giao dịch
+    final txData = {
+      "from": account,
+      "to": _contract!.address.hex,
+      "data": "0x${hex.encode(encodedData)}",
+      "value": "0x${amount.toRadixString(16)}", // Số tiền gửi đi (ETH)
+    };
+
+
+    // 🔹 Ký và gửi giao dịch bằng WalletConnect V2
+    try {
+      final result = await web3App!.request(
+        topic: session.topic,
+        chainId: 'eip155:${constants.CHAIN_ID}', // Chain ID của blockchain
+        request: SessionRequestParams(
+          method: 'eth_sendTransaction',
+          params: [txData],
+        ),
+      );
+
+      print("✅ Giao dịch mua sản phẩm thành công: $result");
+    } catch (error) {
+      print("❌ Lỗi khi gửi giao dịch: $error");
+    }
+
     notifyListeners();
   }
 }
