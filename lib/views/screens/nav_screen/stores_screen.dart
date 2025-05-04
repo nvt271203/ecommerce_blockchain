@@ -3,9 +3,11 @@ import 'package:sales_business_app/controllers/product_controller.dart';
 import 'package:sales_business_app/views/screens/CreateProductPage.dart';
 import 'package:sales_business_app/views/screens/add_product_screen.dart';
 import 'package:sales_business_app/views/screens/nav_screen/widgets/popular_product_widget.dart';
+import 'package:sales_business_app/views/screens/nav_screen/widgets/product_card_gridview.dart';
 import 'package:sales_business_app/views/screens/widgets/button_widget.dart';
 import '../../../models/product.dart';
 import '../../../services/ContractFactoryServies.dart';
+import 'package:provider/provider.dart';
 
 class StoresScreen extends StatefulWidget {
   const StoresScreen({super.key});
@@ -21,13 +23,25 @@ class _StoresScreenState extends State<StoresScreen> {
   bool isLoading = false; // Biến để kiểm soát trạng thái loading
   String? balance; // Biến lưu số dư ví (nếu cần)
 
-  @override
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   // Không gọi _checkExistingConnection ngay tại initState để tránh kiểm tra ví không cần thiết
+  //   // futureProducts = ProductController().loadPopularProducts();
+  // }
   void initState() {
     super.initState();
-    // Không gọi _checkExistingConnection ngay tại initState để tránh kiểm tra ví không cần thiết
-    futureProducts = ProductController().loadPopularProducts();
+    Future.microtask(() async {
+      await _checkExistingConnection();
+      var contractFactory = Provider.of<ContractFactoryServies>(context, listen: false);
+      // await contractFactory.saveAccountAddress(widget.account);
+      // Phải có dòng này
+      //1. lưu trạng thái ví, để từ địa chỉ ví mà lọc đến các hàm như get ra các sản phẩm hiện tại của người dùng.
+      await contractFactory.getBalance(walletAddress!);
+      // await contractFactory.fetchProductCount(); // Gọi trước
+      await contractFactory.getUserProducts(walletAddress!); // Gọi sau
+    });
   }
-
   Future<void> _checkExistingConnection() async {
     setState(() {
       isLoading = true; // Bật loading khi bắt đầu kiểm tra
@@ -61,6 +75,9 @@ class _StoresScreenState extends State<StoresScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var contractFactory = Provider.of<ContractFactoryServies>(context);
+    print('contractFactory.allUserProducts.length - ${contractFactory.allUserProducts.length}');
+
     return Scaffold(
       backgroundColor: Colors.grey[200],
       body: SafeArea(
@@ -165,7 +182,24 @@ class _StoresScreenState extends State<StoresScreen> {
                 ),
               ),
               SizedBox(height: 10),
-              PopularProductWidget(),
+              // PopularProductWidget(),
+              Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Container(
+                  height: MediaQuery.of(context).size.height * 0.70,
+                  child: ListView.builder(
+                      itemCount: contractFactory.allUserProducts.length,
+                      itemBuilder: (context, index) {
+                        return customProductCardWidget(
+                            context,
+                            contractFactory.allUserProducts[index].image,
+                            contractFactory.allUserProducts[index].name,
+                            contractFactory.allUserProducts[index].price
+                                .toString(),
+                            contractFactory.allUserProducts[index]);
+                      }),
+                ),
+              ),
             ],
           ),
         ),

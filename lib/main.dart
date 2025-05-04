@@ -8,16 +8,18 @@ import 'package:sales_business_app/views/screens/nav_screen/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => ContractFactoryServies()),
-        // Nếu có provider khác (như userProvider), thêm vào đây
-      ],
-      child: const MyApp(),
-    ),
-  );
+  runApp(const MyApp());
+
+  // WidgetsFlutterBinding.ensureInitialized();
+  // runApp(
+  //   MultiProvider(
+  //     providers: [
+  //       ChangeNotifierProvider(create: (_) => ContractFactoryServies()),
+  //       // Nếu có provider khác (như userProvider), thêm vào đây
+  //     ],
+  //     child: const MyApp(),
+  //   ),
+  // );
 }
 
 class MyApp extends StatefulWidget {
@@ -32,10 +34,12 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return ChangeNotifierProvider<ContractFactoryServies>(create: (context)=>ContractFactoryServies(),
+      child: MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      home: MainScreen(),
-    );
+    home: MainScreen(),
+      ),);
+
   }
 }

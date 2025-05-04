@@ -213,13 +213,21 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 convertedPrice.length > 3
-                    ? Text(
-                  " ETH ${convertedPrice.substring(0, 5)} ",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 35,
-                      color: constants.mainBlackColor),
-                )
+                    ?
+                // Text(
+                //   " ETH ${convertedPrice.substring(0, 5)} ",
+                //   style: TextStyle(
+                //       fontWeight: FontWeight.bold,
+                //       fontSize: 35,
+                //       color: constants.mainBlackColor),
+                // )
+            Text(
+            " ETH ${convertedPrice.length >= 5 ? convertedPrice.substring(0, 5) : convertedPrice} ",
+      style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 35,
+          color: constants.mainBlackColor),
+    )
                     : Text(
                   " ETH ${convertedPrice} ",
                   style: TextStyle(

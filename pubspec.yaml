@@ -57,6 +57,7 @@ dev_dependencies:
   intl: ^0.18.1
   flutter_svg: ^2.1.0
   random_avatar: ^0.0.8
+  cached_network_image: ^3.3.1
 
   web3dart: ^2.6.1
   walletconnect_flutter_v2: ^2.0.14

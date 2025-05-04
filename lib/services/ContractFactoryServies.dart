@@ -1,39 +1,22 @@
 import 'dart:convert';
 
-// import 'package:ercommerce_ddap/pages/accountProfilePage.dart';
-// import 'package:ercommerce_ddap/utils/Constants.dart';
-// import 'package:ercommerce_ddap/wallet_services/config/crypto/eip155.dart';
-// import 'package:ercommerce_ddap/wallet_services/config/models/chain_metadata.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-// import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:convert/convert.dart';
-
-// import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:web_socket_channel/io.dart';
-// import 'package:ercommerce_ddap/pages/accountProfilePage.dart';
-// import 'package:ercommerce_ddap/utils/Constants.dart';
-// import 'package:ercommerce_ddap/utils/WalletConnectCridentials.dart';
+
 import '../utils/Constants.dart';
 import '../utils/Preference.dart';
 import '../wallet_services/config/crypto/eip155.dart';
 import '../wallet_services/config/models/chain_metadata.dart';
 import 'Models/ProductModel.dart';
-// import 'package:wallet_connect_v2/wallet_connect_v2.dart';
 
-import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
-
-// import 'package:ecommerce_dapp/utils/Preference.dart';
-// import 'package:ecommerce_dapp/wallet_services/config/crypto/eip155.dart';
-// import 'package:ecommerce_dapp/wallet_services/config/models/chain_metadata.dart';
 
 class ContractFactoryServies extends ChangeNotifier {
   Constants constants = Constants();
@@ -45,6 +28,8 @@ class ContractFactoryServies extends ChangeNotifier {
   DeployedContract? _contract;
   bool storeNameLoading = true;
   List<ProductModel> allProducts = [];
+  List<ProductModel> allUserProducts = [];
+
   bool storeProductsLoading = true;
 
   String? _abiCode;
@@ -112,10 +97,10 @@ class ContractFactoryServies extends ChangeNotifier {
               .cast<String>();
         });
 
-    // start----Get all product.
+    // start----
     await _fetchABIAndContractAdrress();
     await _getDeployedContract();
-    // end -----Get all product.
+    // end -----
   }
   Future<void> _fetchABIAndContractAdrress() async {
     // Thêm abis ở assets vào
@@ -169,8 +154,8 @@ class ContractFactoryServies extends ChangeNotifier {
     web3App = await Web3App.createInstance(
       projectId: '9b33a43d15958fe96e9e2035a2f323fc',
       metadata: const PairingMetadata(
-        name: 'Ercommerce Dapp',
-        description: 'Magic shoes web3App mobile app',
+        name: 'Ecommerce Dapp',
+        description: 'The Ecommerce dapp',
         url: 'https://www.magicclub.io/',
         icons: [
           'https://firebasestorage.googleapis.com/v0/b/magic-club-dev-20a01.appspot.com/o/app_logo.png?alt=media&token=7f819657-cf78-441c-8294-ce1fbaf31580&_gl=1*1ruy4yv*_ga*MjU4NjA5MzQuMTY2MDY0MzgwMg..*_ga_CW55HF8NVT*MTY4NTUyODkwOS4xOS4xLjE2ODU1MjkxMTQuMC4wLjA.'
@@ -274,18 +259,8 @@ class ContractFactoryServies extends ChangeNotifier {
     } else {
       debugPrint("Successfully launched URL, waiting for wallet response");
     }
+    notifyListeners();
   }
-  // Future<void> moveToWalletApp(Uri? uri) async {
-  //   Preference.shared.setString(Preference.connectionURL, uri.toString());
-  //
-  //   bool isLaunch = await launchUrl(
-  //     uri!,
-  //     mode: LaunchMode.externalApplication,
-  //   );
-  //   if (!isLaunch) {
-  //     throw 'Failure - Could not open URL $uri.';
-  //   }
-  // }
 
 // Thêm một phương thức để kiểm tra và khôi phục kết nối từ dữ liệu phiên đã lưu:
   Future<String?> restoreWalletConnection() async {
@@ -330,26 +305,6 @@ class ContractFactoryServies extends ChangeNotifier {
       debugPrint("No active wallet connection to disconnect.");
     }
   }
-  // // Hàm lấy ra số dư ví thông qua địa chỉ ví
-  // Future<void> fetchMyBalance(String accountAddress) async {
-  //   try {
-  //     // if (_client == null) {
-  //     //   _client = Web3Client(chain.rpc[0], Client()); // Kết nối với RPC
-  //     // }
-  //     if (_cleint == null) {
-  //       _cleint = Web3Client(chain.rpc[0], Client()); // Kết nối với RPC
-  //     }
-  //     EtherAmount balance = await _cleint!.getBalance(EthereumAddress.fromHex(accountAddress));
-  //     String convertedValueToETH = balance.getValueInUnit(EtherUnit.ether).toString();
-  //     myBalance = convertedValueToETH;
-  //     print('My balance is WEI  IS- ${myBalance}');
-  //     notifyListeners(); // Thông báo cho UI cập nhật lại
-  //     debugPrint('Số dư ví: $myBalance ETH');
-  //   } catch (e) {
-  //     debugPrint('Lỗi khi lấy số dư: $e');
-  //   }
-  // }
-  // Hàm lấy số dư của địa chỉ ví
   // Hàm lấy số dư với tham số địa chỉ ví
   Future<String> getBalance(String address) async {
     if (_cleint == null) {
@@ -525,11 +480,20 @@ class ContractFactoryServies extends ChangeNotifier {
       );
 
       print("✅ Giao dịch thành công: $result");
+      await _setUpNetwork();
+      // await _getStoreName();
+      // await _getStoreProductCount();
+      // await _getAllProducts();
+      // Đợi giao dịch được xác nhận
+      // await _waitForTransactionConfirmation(result);
+
+
 
       // Gọi _getAllProducts() ngay sau khi giao dịch thành công
-      await _getAllProducts();
-      notifyListeners();
       print("Danh sách sản phẩm đã được cập nhật: ${allProducts.length} sản phẩm");
+      await _getAllProducts();
+
+      notifyListeners();
 
     } catch (error) {
       print("❌ Lỗi khi gửi giao dịch: $error");
@@ -538,6 +502,24 @@ class ContractFactoryServies extends ChangeNotifier {
     fetchProductCreatedEvent(context);
     // notifyListeners();
   }
+
+  Future<void> _waitForTransactionConfirmation(String transactionHash) async {
+    if (_cleint == null) {
+      throw Exception("Web3Client chưa được khởi tạo.");
+    }
+
+    print("Đang đợi giao dịch $transactionHash được xác nhận...");
+    TransactionReceipt? receipt;
+    while (receipt == null) {
+      receipt = await _cleint!.getTransactionReceipt(transactionHash);
+      if (receipt == null) {
+        await Future.delayed(Duration(seconds: 2)); // Đợi 2 giây trước khi thử lại
+      }
+    }
+    print("Giao dịch $transactionHash đã được xác nhận trong block ${receipt.blockNumber}");
+  }
+
+
   //Create Product Event
   fetchProductCreatedEvent(context) async {
     _cleint!
@@ -548,10 +530,11 @@ class ContractFactoryServies extends ChangeNotifier {
       print("event of Create Product ${event}");
       if (event.transactionHash!.isNotEmpty) {
         productCreatedLoading = false;
-
+        print('Đã chạy vào đây ');
         // Cập nhật lại danh sách sản phẩm
-        // await _getAllProducts(); // Làm mới allProducts
-        // print("Danh sách sản phẩm đã được cập nhật: ${allProducts.length} sản phẩm");
+        await _getAllProducts(); // Làm mới allProducts
+        print("Danh sách sản phẩm đã được cập nhật: ${allProducts.length} sản phẩm");
+        notifyListeners();
 
         // Navigator.pushReplacement(
         //     context,
@@ -560,7 +543,6 @@ class ContractFactoryServies extends ChangeNotifier {
         //             AccountProfilePage(account: myAccount.toString())));
       }
     });
-    notifyListeners();
   }
   saveAccountAddress(String account) {
     myAccount = account;
@@ -626,6 +608,48 @@ class ContractFactoryServies extends ChangeNotifier {
       print("❌ Lỗi khi gửi giao dịch: $error");
     }
 
+    notifyListeners();
+  }
+  // ----------------GET PRODUCT USER-----------------------
+  getUserProducts(String addressWallet) async {
+    try {
+      int count = int.parse(_productCount.toString());
+      print('conut number allproduct: $count');
+      allUserProducts.clear();
+
+      print('My Accout: ${myAccount.toString()}');
+      // print('My Accout: ${.toString()}');
+
+      for (int i = 1; i <= count; i++) {
+        List<dynamic> product = await _cleint!.call(
+          contract: _contract!,
+          function: _contract!.function("storeProducts"),
+          params: [BigInt.from(i)],
+        );
+
+        print("Dữ liệu sản phẩm [$i]: $product");
+
+        // if (product.isNotEmpty && product[5].toString() == myAccount.toString()) {
+        if (product.isNotEmpty && product[5].toString() == addressWallet) {
+          allUserProducts.add(ProductModel(
+            id: product[0],
+            name: product[1],
+            description: product[2],
+            image: product[3],
+            sold: product[4],
+            owner: product[5],
+            price: product[6],
+            category: product[7],
+          ));
+          print("Dữ liệu sản phẩm length[$i]: ${allUserProducts.length}");
+
+        }
+      }
+      storeProductsLoading = false;
+    } catch (e) {
+      storeProductsLoading = true;
+      print("Lỗi khi tải sản phẩm: $e"); // Thêm dòng này để debug lỗi
+    }
     notifyListeners();
   }
 }

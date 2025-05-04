@@ -205,8 +205,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
 
         request.headers['Content-Type'] = 'multipart/form-data';
         request.headers['pinata_api_key'] = constants.PINATA_API_KEY;
-        request.headers['pinata_secret_api_key'] =
-            constants.PINATA_API_SECRET_KEY;
+        request.headers['pinata_secret_api_key'] = constants.PINATA_API_SECRET_KEY;
 
         //SEND DATA
 

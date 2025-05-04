@@ -19,6 +19,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,50 +65,50 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
             //-----------------------
-              Consumer<ContractFactoryServies>(
-                builder: (context, contractFactoryServies, child) {
-                  return Column(
-                    children: [
-                      // Hiển thị số lượng sản phẩm
-                      Text(
-                        'Số lượng sản phẩm: ${contractFactoryServies.allProducts.length}',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 10),
-                      // Hiển thị trạng thái tải hoặc danh sách sản phẩm
-                      if (contractFactoryServies.storeProductsLoading)
-                        Center(child: CircularProgressIndicator())
-                      else if (contractFactoryServies.allProducts.isEmpty)
-                        Center(child: Text('Không có sản phẩm nào'))
-                      else
-                        Container(
-                          child: AlignedGridView.count(
-                            physics: NeverScrollableScrollPhysics(),
-                            mainAxisSpacing: 15,
-                            crossAxisSpacing: 15,
-                            padding: EdgeInsets.all(15),
-                            itemCount: contractFactoryServies.allProducts.length,
-                            shrinkWrap: true,
-                            scrollDirection: Axis.vertical,
-                            crossAxisCount: 2,
-                            itemBuilder: (context, index) {
-                              return customProductCardWidget(
-                                context,
-                                contractFactoryServies.allProducts[index].image,
-                                contractFactoryServies.allProducts[index].name,
-                                contractFactoryServies.allProducts[index].price.toString(),
-                                contractFactoryServies.allProducts[index],
-                              );
-                            },
-                          ),
+            Consumer<ContractFactoryServies>(
+              builder: (context, contractFactoryServies, child) {
+                return Column(
+                  children: [
+                    // Hiển thị số lượng sản phẩm
+                    Text(
+                      'Số lượng sản phẩm: ${contractFactoryServies.allProducts.length}',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
+                    // Hiển thị trạng thái tải hoặc danh sách sản phẩm
+                    if (contractFactoryServies.storeProductsLoading)
+                      Center(child: CircularProgressIndicator())
+                    else if (contractFactoryServies.allProducts.isEmpty)
+                      Center(child: Text('Không có sản phẩm nào'))
+                    else
+                      Container(
+                        child: AlignedGridView.count(
+                          physics: NeverScrollableScrollPhysics(),
+                          mainAxisSpacing: 15,
+                          crossAxisSpacing: 15,
+                          padding: EdgeInsets.all(15),
+                          itemCount: contractFactoryServies.allProducts.length,
+                          shrinkWrap: true,
+                          scrollDirection: Axis.vertical,
+                          crossAxisCount: 2,
+                          itemBuilder: (context, index) {
+                            return customProductCardWidget(
+                              context,
+                              contractFactoryServies.allProducts[index].image,
+                              contractFactoryServies.allProducts[index].name,
+                              contractFactoryServies.allProducts[index].price.toString(),
+                              contractFactoryServies.allProducts[index],
+                            );
+                          },
                         ),
-                    ],
-                  );
-                },
-              ),
-            ],
-          ),
+                      ),
+                  ],
+                );
+              },
+            ),
+          ],
         ),
-      );
+      ),
+    );
   }
 }
